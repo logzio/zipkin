@@ -13,13 +13,13 @@
  */
 package zipkin2.autoconfigure.prometheus;
 
+import com.linecorp.armeria.spring.ArmeriaServerConfigurator;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.boot.web.embedded.undertow.UndertowDeploymentInfoCustomizer;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +44,7 @@ public class ZipkinPrometheusMetricsAutoConfigurationTest {
   @Test public void providesHttpRequestDurationCustomizer() {
     refresh();
 
-    context.getBean(UndertowDeploymentInfoCustomizer.class);
+    context.getBean(ArmeriaServerConfigurator.class);
   }
 
   @Test public void defaultMetricName() {

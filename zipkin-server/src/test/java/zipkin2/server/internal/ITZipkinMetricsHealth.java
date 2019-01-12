@@ -45,7 +45,10 @@ import static zipkin2.TestObjects.LOTS_OF_SPANS;
 @SpringBootTest(
   classes = ZipkinServer.class,
   webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-  properties = "spring.config.name=zipkin-server"
+  properties = {
+    "spring.config.name=zipkin-server",
+    "spring.main.web-application-type=none"
+  }
 )
 @RunWith(SpringRunner.class)
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
