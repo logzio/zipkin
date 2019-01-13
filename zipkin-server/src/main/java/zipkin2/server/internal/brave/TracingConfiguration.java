@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 The OpenZipkin Authors
+ * Copyright 2015-2019 The OpenZipkin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -14,13 +14,14 @@
 package zipkin2.server.internal.brave;
 
 import brave.Tracing;
-import brave.context.log4j2.ThreadContextCurrentTraceContext;
+import brave.context.log4j2.ThreadContextScopeDecorator;
 import brave.http.HttpAdapter;
 import brave.http.HttpSampler;
 import brave.http.HttpTracing;
 import brave.propagation.CurrentTraceContext;
 import brave.sampler.BoundarySampler;
 import brave.sampler.Sampler;
+import com.linecorp.armeria.common.tracing.RequestContextCurrentTraceContext;
 import com.linecorp.armeria.server.tracing.HttpTracingService;
 import com.linecorp.armeria.spring.ArmeriaServerConfigurator;
 import java.util.ArrayList;
@@ -69,9 +70,10 @@ public class TracingConfiguration {
         .build();
   }
 
-  @Bean
-  CurrentTraceContext currentTraceContext() {
-    return ThreadContextCurrentTraceContext.create(); // puts trace IDs into logs
+  @Bean CurrentTraceContext currentTraceContext() {
+    return RequestContextCurrentTraceContext.newBuilder()
+      .addScopeDecorator(ThreadContextScopeDecorator.create()) // puts trace IDs into logs
+      .build();
   }
 
   /** Controls aspects of tracing such as the name that shows up in the UI */

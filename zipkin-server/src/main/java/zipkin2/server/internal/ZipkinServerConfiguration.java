@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 The OpenZipkin Authors
+ * Copyright 2015-2019 The OpenZipkin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -44,7 +44,17 @@ import zipkin2.storage.StorageComponent;
 public class ZipkinServerConfiguration implements WebMvcConfigurer {
 
   @Autowired(required = false)
+  ZipkinQueryApiV2 httpQuery;
+
+  @Autowired(required = false)
   ZipkinHttpCollector httpCollector;
+
+  @Bean ArmeriaServerConfigurator httpCollectorConfigurator() {
+    return server -> {
+      if (httpQuery != null) server.annotatedService(httpQuery);
+      if (httpCollector != null) server.annotatedService(httpCollector);
+    };
+  }
 
   /** Registers health for any components, even those not in this jar. */
   @Bean
