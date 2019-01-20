@@ -16,6 +16,8 @@ package zipkin2.elasticsearch.internal.client;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -83,9 +85,12 @@ public final class HttpCall<V> extends Call<V> {
   }
 
   @Override public void enqueue(Callback<V> delegate) {
-    if (!semaphore.tryAcquire()) {
-      delegate.onError(new IllegalStateException("over capacity"));
-      return;
+    try {
+      if (!semaphore.tryAcquire(15, TimeUnit.SECONDS)) {
+        delegate.onError(new IllegalStateException("over capacity"));
+        return;
+      }
+    } catch (InterruptedException ignored) {
     }
     call.enqueue(new V2CallbackAdapter<>(semaphore, bodyConverter, delegate));
   }
